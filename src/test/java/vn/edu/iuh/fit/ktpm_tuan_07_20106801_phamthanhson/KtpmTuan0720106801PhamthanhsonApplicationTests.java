@@ -26,17 +26,37 @@ class KtpmTuan0720106801PhamthanhsonApplicationTests {
 
     @Test
     void contextLoads() {
+        // giả lập dữ liệu từ web gửi đi
         Faker faker = new Faker();
         List<ProductReceive> productReceives = new ArrayList<>();
-        for (int i = 0; i < 2; i++) {
-            Product product = productRepository.findById((long) faker.number().numberBetween(1, 25)).get();
-            ProductReceive productReceive = new ProductReceive();
-            productReceive.setProduct(product);
-            productReceive.setEmail("thanhson280502@gmail.com");
-            productReceive.setQuantity(faker.number().numberBetween(0, 100));
-            productReceives.add(productReceive);
+        String mail = "thanhson280502@gmail.com";
+        int soLuongSanPham = productRepository.findAll().size();
+        int soLuongSanPhamCanMua = 10;
+        if (soLuongSanPhamCanMua <= soLuongSanPham){
+            for (int i = 0; i < soLuongSanPhamCanMua; i++) {
+                ProductReceive productReceive = new ProductReceive();
+                Product product = null;
+                // kiểm tra product đã có chưa
+                while (true){
+                    product = productRepository.findById((long) faker.number().numberBetween(1,soLuongSanPham )).get();
+                    boolean checkContain = false;
+                    for (ProductReceive receive:productReceives) {
+                        if (receive.getProduct() == product){
+                            checkContain=true;
+                            break;
+                        }
+                    }
+                    if (!checkContain){
+                        break;
+                    }
+                }
+                productReceive.setProduct(product);
+                productReceive.setEmail(mail);
+                productReceive.setQuantity(faker.number().numberBetween(0, 100));
+                productReceives.add(productReceive);
+                String json = gson.ListObjectToJson(productReceives);
+                jmsTemplate.convertAndSend("animal_Shop", encryption.enCode(json));
+            }
         }
-        String json = gson.ListObjectToJson(productReceives);
-        jmsTemplate.convertAndSend("animal_Shop", encryption.enCode(json));
     }
 }

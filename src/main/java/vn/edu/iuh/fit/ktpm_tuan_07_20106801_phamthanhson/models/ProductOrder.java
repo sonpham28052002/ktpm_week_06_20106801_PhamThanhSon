@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
+
 @Entity
 @Setter
 @Getter
@@ -19,4 +21,5 @@ public class ProductOrder {
     private Product product;
     private int quantity;
     private double total;
+    private LocalDate orderDate;
 }

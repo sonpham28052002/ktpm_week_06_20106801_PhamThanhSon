@@ -14,6 +14,7 @@ import vn.edu.iuh.fit.ktpm_tuan_07_20106801_phamthanhson.models.ProductReceive;
 import vn.edu.iuh.fit.ktpm_tuan_07_20106801_phamthanhson.repositories.ProductOrderRepository;
 import vn.edu.iuh.fit.ktpm_tuan_07_20106801_phamthanhson.repositories.ProductRepository;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,22 +47,28 @@ public class MessageService {
             //4. make order or reject
             String textNotification ="";
             if (productList.isEmpty()){
-                textNotification+="Đơn hàng của bạn đã được lập thành công. \n ";
+                LocalDate date = LocalDate.now();
+                textNotification+="Đơn hàng của bạn đã được lập thành công vào luc. "+date.toString()+"\n ";
                 double total = 0;
                 for (ProductReceive productReceive:productReceives) {
                     total+=productReceive.getProduct().getPrice()*productReceive.getQuantity();
                     textNotification += "\t\t"+productReceive.getProduct().getName()+":\t"+productReceive.getProduct().getPrice()*productReceive.getQuantity()+"\n";
                     ProductOrder productOrder = new ProductOrder();
+                    productOrder.setProduct(productReceive.getProduct());
+                    productOrder.setQuantity(productReceive.getQuantity());
+                    productOrder.setOrderDate(date);
+                    productOrder.setTotal(productReceive.getProduct().getPrice()*productReceive.getQuantity());
                     productOrderRepository.save(productOrder);
                 }
                 textNotification += "\t\tTotal: \t"+total;
 
             }else {
-                textNotification+="Đơn hàng của bạn không thể lập.\n \t\tLý do:\n ";
+                textNotification+="Đơn hàng của bạn không thể lập.\n \t\tLý do là các sản phẩm:";
                 for (Product product:productList) {
-                    textNotification+="\t\t- "+product.getName();
+                    textNotification+=" "+product.getName()+",";
                 }
-                textNotification+="=> không đủ số lượng yêu cầu";
+                textNotification = textNotification.substring(0,textNotification.length()-1);
+                textNotification+=" => không đủ số lượng yêu cầu";
             }
             System.out.println(textNotification);
             //5. send email
