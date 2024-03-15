@@ -32,7 +32,7 @@ class KtpmTuan0720106801PhamthanhsonApplicationTests {
             Product product = productRepository.findById((long) faker.number().numberBetween(1, 25)).get();
             ProductReceive productReceive = new ProductReceive();
             productReceive.setProduct(product);
-            productReceive.setEmail("dangthiquyentran22@gmail.com");
+            productReceive.setEmail("thanhson280502@gmail.com");
             productReceive.setQuantity(faker.number().numberBetween(0, 100));
             productReceives.add(productReceive);
         }
